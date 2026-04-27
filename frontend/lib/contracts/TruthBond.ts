@@ -1,42 +1,41 @@
+"use client";
+
 import { createClient } from "genlayer-js";
 import { testnetBradbury } from "genlayer-js/chains";
 
-export const CONTRACT_ADDRESS = process.env
-  .NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
+export const CONTRACT_ADDRESS = (
+  process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 
+  "0x21F6D24E5b422780e6253A0F25620AC56246"
+) as `0x${string}`;
 
-export const RPC_URL =
-  process.env.NEXT_PUBLIC_GENLAYER_RPC_URL ||
-  "https://rpc-bradbury.genlayer.com";
-
-export function getTruthBondClient(account?: `0x${string}`) {
-  return createClient({
-    chain: testnetBradbury,
-    account: account
-      ? { address: account }
-      : undefined,
-  });
+function getBradburyClient() {
+  return createClient({ chain: testnetBradbury });
 }
 
 export async function getTotalClaims(): Promise<number> {
-  const client = getTruthBondClient();
-  const result = await client.readContract({
-    address: CONTRACT_ADDRESS,
-    functionName: "get_total_claims",
-    args: [],
-  });
-  return Number(result) || 0;
+  try {
+    const client = getBradburyClient();
+    const result = await client.readContract({
+      address: CONTRACT_ADDRESS,
+      functionName: "get_total_claims",
+      args: [],
+    });
+    return Number(result) || 0;
+  } catch {
+    return 0;
+  }
 }
 
-export async function getClaim(id: number): Promise<Claim | null> {
+export async function getClaimById(id: number) {
   try {
-    const client = getTruthBondClient();
+    const client = getBradburyClient();
     const result = await client.readContract({
       address: CONTRACT_ADDRESS,
       functionName: "get_claim",
       args: [id],
     });
     const parsed = typeof result === "string" ? JSON.parse(result) : result;
-    return { id, ...parsed } as Claim;
+    return { id, ...parsed };
   } catch {
     return null;
   }
