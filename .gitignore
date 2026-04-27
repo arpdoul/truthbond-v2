@@ -23,3 +23,6 @@ __pycache__/
 *.compiled.js
 package-lock.json
 
+frontend/.env
+.env
+node_modules/
