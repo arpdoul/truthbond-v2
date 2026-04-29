@@ -1,18 +1,14 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useWallet } from "@/lib/genlayer/wallet";
 import { useState } from "react";
+import { connectMetaMask, switchToGenLayerNetwork, isOnGenLayerNetwork } from "@/lib/genlayer/client";
 
 export function Navbar() {
-  const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
-  const [showMenu, setShowMenu] = useState(false);
+  const { address, isConnected, connectWallet, disconnectWallet } = useWallet();
+  const [open, setOpen] = useState(false);
 
-  function shortAddr(addr: string) {
-    return addr.slice(0, 6) + "..." + addr.slice(-4);
-  }
+  const short = (a: string) => a.slice(0, 6) + "..." + a.slice(-4);
 
   return (
     <header className="border-b border-border bg-background/95 backdrop-blur sticky top-0 z-50">
@@ -21,22 +17,24 @@ export function Navbar() {
           TRUTH<span className="text-green-400">BOND</span>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground border border-border px-3 py-1.5">
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground border border-border px-3 py-1.5 rounded-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse inline-block" />
             BRADBURY TESTNET
           </div>
           {isConnected && address ? (
             <div className="relative">
               <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="text-xs border border-green-400 bg-green-400 text-black font-bold tracking-widest px-3 py-1.5 hover:bg-green-300 transition-colors">
-                {shortAddr(address)} ▾
+                onClick={() => setOpen(!open)}
+                className="text-xs border border-green-400 bg-green-400 text-black font-bold tracking-widest px-3 py-1.5 hover:bg-green-300 transition-colors rounded-sm"
+              >
+                {short(address)} ▾
               </button>
-              {showMenu && (
-                <div className="absolute right-0 top-full mt-1 border border-border bg-card text-xs w-40 z-50">
+              {open && (
+                <div className="absolute right-0 top-full mt-1 border border-border bg-card text-xs w-40 z-50 rounded-sm shadow-lg">
                   <button
-                    onClick={() => { disconnect(); setShowMenu(false); }}
-                    className="w-full text-left px-3 py-2 hover:bg-border/30 text-muted-foreground">
+                    onClick={() => { disconnectWallet(); setOpen(false); }}
+                    className="w-full text-left px-3 py-2.5 hover:bg-border/30 text-muted-foreground"
+                  >
                     Disconnect
                   </button>
                 </div>
@@ -44,8 +42,9 @@ export function Navbar() {
             </div>
           ) : (
             <button
-              onClick={() => connect({ connector: injected() })}
-              className="text-xs border border-green-400 text-green-400 font-bold tracking-widest px-3 py-1.5 hover:bg-green-400 hover:text-black transition-colors">
+              onClick={connectWallet}
+              className="text-xs border border-green-400 text-green-400 font-bold tracking-widest px-3 py-1.5 hover:bg-green-400 hover:text-black transition-colors rounded-sm"
+            >
               CONNECT WALLET
             </button>
           )}

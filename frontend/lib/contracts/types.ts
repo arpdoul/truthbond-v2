@@ -4,7 +4,4 @@ export interface Claim {
   status: "pending" | "verified";
   verdict?: "FAKE" | "REAL";
   reason?: string;
-  submitter?: string;
 }
-
-export type Verdict = "FAKE" | "REAL" | "PENDING";
