@@ -26,8 +26,6 @@ class TruthBond {
         address: this.contractAddress,
         functionName: "get_total_claims",
         args: [],
-        // @ts-ignore
-        type: "read",
       });
       return Number(result) || 0;
     } catch {
@@ -41,8 +39,6 @@ class TruthBond {
         address: this.contractAddress,
         functionName: "get_claim",
         args: [id],
-        // @ts-ignore
-        type: "read",
       });
       const parsed = typeof result === "string" ? JSON.parse(result) : result;
       return { id, ...parsed } as Claim;
@@ -51,36 +47,46 @@ class TruthBond {
     }
   }
 
-  async submitClaim(articleUrl: string): Promise<`0x${string}`> {
-    const txHash: any = await this.client.writeContract({
-      address: this.contractAddress,
-      functionName: "submit_claim",
-      args: [articleUrl],
-      // @ts-ignore
-      type: "write",
-    });
-    await this.client.waitForTransactionReceipt({
-      hash: txHash,
-      retries: 60,
-      interval: 8000,
-    });
-    return txHash;
+  async submitClaim(articleUrl: string): Promise<any> {
+    try {
+      const txHash = await this.client.writeContract({
+        address: this.contractAddress,
+        functionName: "submit_claim",
+        args: [articleUrl],
+        value: BigInt(0),
+      });
+      const receipt = await this.client.waitForTransactionReceipt({
+        hash: txHash,
+        status: "ACCEPTED" as any,
+        retries: 24,
+        interval: 5000,
+      });
+      return receipt;
+    } catch (error) {
+      console.error("Error submitting claim:", error);
+      throw new Error("Failed to submit claim");
+    }
   }
 
-  async verifyClaim(claimId: number): Promise<`0x${string}`> {
-    const txHash: any = await this.client.writeContract({
-      address: this.contractAddress,
-      functionName: "verify_claim",
-      args: [claimId],
-      // @ts-ignore
-      type: "write",
-    });
-    await this.client.waitForTransactionReceipt({
-      hash: txHash,
-      retries: 60,
-      interval: 8000,
-    });
-    return txHash;
+  async verifyClaim(claimId: number): Promise<any> {
+    try {
+      const txHash = await this.client.writeContract({
+        address: this.contractAddress,
+        functionName: "verify_claim",
+        args: [claimId],
+        value: BigInt(0),
+      });
+      const receipt = await this.client.waitForTransactionReceipt({
+        hash: txHash,
+        status: "ACCEPTED" as any,
+        retries: 24,
+        interval: 5000,
+      });
+      return receipt;
+    } catch (error) {
+      console.error("Error verifying claim:", error);
+      throw new Error("Failed to verify claim");
+    }
   }
 }
 
