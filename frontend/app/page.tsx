@@ -91,7 +91,7 @@ export default function Home() {
         <div className="border border-border p-4 flex flex-wrap gap-4 text-xs rounded-sm">
           <div>
             <span className="text-muted-foreground tracking-widest uppercase block mb-1">Contract</span>
-            <a href="https://explorer-bradbury.genlayer.com/address/0x21F6D24E5b422780e6253A0F25620AC56246" target="_blank" className="text-green-400 hover:underline break-all">
+            <a href="https://explorer-bradbury.genlayer.com/address/0x21F6D24E5b422780e6253A0F25620AC56246313A" target="_blank" className="text-green-400 hover:underline break-all">
               0x21F6D24E5b422780...AC56246
             </a>
           </div>
